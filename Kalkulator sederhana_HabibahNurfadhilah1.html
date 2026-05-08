@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Sederhana</title>
+    <style>
+        /* --- CSS RESET & BASE --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* --- CARD KALKULATOR (RESPONSIF) --- */
+        .calculator-card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px; /* Batas maksimal lebar di desktop */
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* --- FORM STYLING --- */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e4e8;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #007bff;
+        }
+
+        /* Tombol Hitung (=) */
+        .btn-calculate {
+            width: 100%;
+            padding: 14px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calculate:hover {
+            background-color: #0056b3;
+        }
+
+        /* --- PANEL HASIL --- */
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e3f2fd;
+            border-left: 5px solid #007bff;
+            border-radius: 6px;
+            display: none; /* Tersembunyi di awal */
+        }
+
+        .result-title {
+            font-size: 14px;
+            color: #0056b3;
+            font-weight: bold;
+        }
+
+        .result-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 5px;
+        }
+
+        /* Pesan Error Validasi */
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator-card">
+        <h2>Kalkulator Web</h2>
+        
+        <div class="form-group">
+            <label for="num1">Angka Pertama</label>
+            <input type="number" id="num1" placeholder="Masukkan angka">
+            <div class="error-message" id="error1">Angka pertama harus diisi dan berupa angka!</div>
+        </div>
+
+        <div class="form-group">
+            <label for="operator">Operasi</label>
+            <select id="operator">
+                <option value="tambah">Tambah (+)</option>
+                <option value="kurang">Kurang (-)</option>
+                <option value="kali">Kali (x)</option>
+                <option value="bagi">Bagi (/)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="num2">Angka Kedua</label>
+            <input type="number" id="num2" placeholder="Masukkan angka">
+            <div class="error-message" id="error2">Angka kedua harus diisi dan berupa angka!</div>
+        </div>
+
+        <button class="btn-calculate" onclick="hitung()">=</button>
+
+        <div class="result-container" id="resultBox">
+            <div class="result-title">Hasil Perhitungan:</div>
+            <div class="result-value" id="resultValue">0</div>
+        </div>
+    </div>
+
+    <script>
+        function hitung() {
+            // Ambil element input dan error
+            const num1Input = document.getElementById('num1');
+            const num2Input = document.getElementById('num2');
+            const operator = document.getElementById('operator').value;
+            
+            const error1 = document.getElementById('error1');
+            const error2 = document.getElementById('error2');
+            const resultBox = document.getElementById('resultBox');
+            const resultValue = document.getElementById('resultValue');
+
+            // Reset state validasi & hasil
+            let isValid = true;
+            error1.style.display = 'none';
+            error2.style.display = 'none';
+            resultBox.style.display = 'none';
+
+            // 1. Validasi Input (Tidak boleh kosong)
+            if (num1Input.value === "" || isNaN(num1Input.value)) {
+                error1.style.display = 'block';
+                isValid = false;
+            }
+            if (num2Input.value === "" || isNaN(num2Input.value)) {
+                error2.style.display = 'block';
+                isValid = false;
+            }
+
+            // Jika validasi gagal, stop fungsi di sini
+            if (!isValid) return;
+
+            // Konversi nilai input ke tipe data float (angka desimal/pecahan)
+            const n1 = parseFloat(num1Input.value);
+            const n2 = parseFloat(num2Input.value);
+            let hasil = 0;
+
+            // 2. Proses Operasi Matematika
+            switch (operator) {
+                case 'tambah':
+                    hasil = n1 + n2;
+                    break;
+                case 'kurang':
+                    hasil = n1 - n2;
+                    break;
+                case 'kali':
+                    hasil = n1 * n2;
+                    break;
+                case 'bagi':
+                    if (n2 === 0) {
+                        alert("Error: Tidak bisa membagi dengan angka 0!");
+                        return;
+                    }
+                    hasil = n1 / n2;
+                    break;
+                default:
+                    hasil = 0;
+            }
+
+            // 3. Tampilkan Hasil (Membatasi maksimal 4 angka di belakang koma untuk desimal panjang)
+            resultValue.textContent = Number(hasil.toFixed(4));
+            resultBox.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
