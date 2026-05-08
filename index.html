@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tugas Pemrograman Web - Kalkulator Sederhana</title>
+    <style>
+        /* --- VARIABLE WARNA UNTUK TEMA (CSS VARIABLES) --- */
+        :root {
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --bg-body: #f0f2f5;
+            --bg-card: #ffffff;
+            --text-main: #333333;
+            --text-sub: #666666;
+            --border-color: #e1e4e8;
+            --result-bg: #e3f2fd;
+            --result-border: #007bff;
+            --result-text: #0056b3;
+        }
+
+        /* --- CSS RESET & BASE --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* --- CARD UTAMA (Kalkulator + Identitas) --- */
+        .container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        /* --- KARTU IDENTITAS MAHASISWA --- */
+        .identity-card {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            border-top: 5px solid var(--primary-color);
+        }
+
+        .identity-card h3 {
+            font-size: 14px;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .identity-grid {
+            display: grid;
+            grid-template-columns: 80px 10px 1fr;
+            row-gap: 8px;
+            font-size: 13.5px;
+            color: #444;
+        }
+
+        .identity-label {
+            font-weight: 600;
+        }
+
+        /* --- KARTU KALKULATOR --- */
+        .calculator-card {
+            background-color: var(--bg-card);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            color: var(--text-main);
+        }
+
+        .calculator-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .calculator-header h2 {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        /* --- PILIHAN TEMA WARNA --- */
+        .theme-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-selector label {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 0;
+            color: var(--text-sub);
+        }
+
+        .theme-select {
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: auto;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-main);
+        }
+
+        /* --- FORM STYLING --- */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            background-color: var(--bg-card);
+            color: var(--text-main);
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* Tombol Hitung (=) */
+        .btn-calculate {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-calculate:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* --- PANEL HASIL --- */
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--result-bg);
+            border-left: 5px solid var(--result-border);
+            border-radius: 6px;
+            display: none; /* Tersembunyi di awal */
+        }
+
+        .result-title {
+            font-size: 13px;
+            color: var(--result-text);
+            font-weight: bold;
+        }
+
+        .result-value {
+            font-size: 26px;
+            font-weight: bold;
+            color: var(--text-main);
+            margin-top: 5px;
+        }
+
+        /* Pesan Error Validasi */
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="identity-card">
+            <h3>Identitas Mahasiswa</h3>
+            <div class="identity-grid">
+                <div class="identity-label">Nama</div>
+                <div>:</div>
+                <div style="font-weight: bold;">HABIBAH NURFADHILAH</div>
+
+                <div class="identity-label">NIM</div>
+                <div>:</div>
+                <div>231011450334</div>
+
+                <div class="identity-label">Matkul</div>
+                <div>:</div>
+                <div>Pemrograman Web</div>
+
+                <div class="identity-label">Dosen</div>
+                <div>:</div>
+                <div>Fajar Agung Nugroho S.Kom, M.Kom</div>
+            </div>
+        </div>
+
+        <div class="calculator-card">
+            <div class="calculator-header">
+                <h2>Kalkulator</h2>
+                
+                <div class="theme-selector">
+                    <label for="theme">Tema:</label>
+                    <select id="theme" class="theme-select" onchange="ubahTema(this.value)">
+                        <option value="blue">Blue</option>
+                        <option value="green">Emerald</option>
+                        <option value="purple">Purple</option>
+                        <option value="dark">Dark Mode</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="num1">Angka Pertama</label>
+                <input type="number" id="num1" placeholder="Masukkan angka">
+                <div class="error-message" id="error1">Angka pertama harus diisi dan berupa angka!</div>
+            </div>
+
+            <div class="form-group">
+                <label for="operator">Operasi</label>
+                <select id="operator">
+                    <option value="tambah">Tambah (+)</option>
+                    <option value="kurang">Kurang (-)</option>
+                    <option value="kali">Kali (x)</option>
+                    <option value="bagi">Bagi (/)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="num2">Angka Kedua</label>
+                <input type="number" id="num2" placeholder="Masukkan angka">
+                <div class="error-message" id="error2">Angka kedua harus diisi dan berupa angka!</div>
+            </div>
+
+            <button class="btn-calculate" onclick="hitung()">=</button>
+
+            <div class="result-container" id="resultBox">
+                <div class="result-title">Hasil Perhitungan:</div>
+                <div class="result-value" id="resultValue">0</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Fungsi merubah Tema Warna CSS secara dinamis
+        function ubahTema(tema) {
+            const root = document.documentElement;
+            
+            if (tema === 'blue') {
+                root.style.setProperty('--primary-color', '#007bff');
+                root.style.setProperty('--primary-hover', '#0056b3');
+                root.style.setProperty('--bg-body', '#f0f2f5');
+                root.style.setProperty('--bg-card', '#ffffff');
+                root.style.setProperty('--text-main', '#333333');
+                root.style.setProperty('--text-sub', '#666666');
+                root.style.setProperty('--border-color', '#e1e4e8');
+                root.style.setProperty('--result-bg', '#e3f2fd');
+                root.style.setProperty('--result-border', '#007bff');
+                root.style.setProperty('--result-text', '#0056b3');
+            } 
+            else if (tema === 'green') {
+                root.style.setProperty('--primary-color', '#2ecc71');
+                root.style.setProperty('--primary-hover', '#27ae60');
+                root.style.setProperty('--bg-body', '#e8f8f5');
+                root.style.setProperty('--bg-card', '#ffffff');
+                root.style.setProperty('--text-main', '#2c3e50');
+                root.style.setProperty('--text-sub', '#7f8c8d');
+                root.style.setProperty('--border-color', '#d5dbdb');
+                root.style.setProperty('--result-bg', '#e8f8f5');
+                root.style.setProperty('--result-border', '#2ecc71');
+                root.style.setProperty('--result-text', '#27ae60');
+            } 
+            else if (tema === 'purple') {
+                root.style.setProperty('--primary-color', '#9b59b6');
+                root.style.setProperty('--primary-hover', '#8e44ad');
+                root.style.setProperty('--bg-body', '#f5eef8');
+                root.style.setProperty('--bg-card', '#ffffff');
+                root.style.setProperty('--text-main', '#2c3e50');
+                root.style.setProperty('--text-sub', '#7f8c8d');
+                root.style.setProperty('--border-color', '#ebdef0');
+                root.style.setProperty('--result-bg', '#f5eef8');
+                root.style.setProperty('--result-border', '#9b59b6');
+                root.style.setProperty('--result-text', '#8e44ad');
+            } 
+            else if (tema === 'dark') {
+                root.style.setProperty('--primary-color', '#e74c3c');
+                root.style.setProperty('--primary-hover', '#c0392b');
+                root.style.setProperty('--bg-body', '#121212');
+                root.style.setProperty('--bg-card', '#1e1e1e');
+                root.style.setProperty('--text-main', '#ffffff');
+                root.style.setProperty('--text-sub', '#aaaaaa');
+                root.style.setProperty('--border-color', '#333333');
+                root.style.setProperty('--result-bg', '#2d2d2d');
+                root.style.setProperty('--result-border', '#e74c3c');
+                root.style.setProperty('--result-text', '#e74c3c');
+            }
+        }
+
+        // Fungsi Perhitungan Matematika & Validasi
+        function hitung() {
+            const num1Input = document.getElementById('num1');
+            const num2Input = document.getElementById('num2');
+            const operator = document.getElementById('operator').value;
+            
+            const error1 = document.getElementById('error1');
+            const error2 = document.getElementById('error2');
+            const resultBox = document.getElementById('resultBox');
+            const resultValue = document.getElementById('resultValue');
+
+            let isValid = true;
+            error1.style.display = 'none';
+            error2.style.display = 'none';
+            resultBox.style.display = 'none';
+
+            // Validasi Input (Tidak boleh kosong)
+            if (num1Input.value === "" || isNaN(num1Input.value)) {
+                error1.style.display = 'block';
+                isValid = false;
+            }
+            if (num2Input.value === "" || isNaN(num2Input.value)) {
+                error2.style.display = 'block';
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            const n1 = parseFloat(num1Input.value);
+            const n2 = parseFloat(num2Input.value);
+            let hasil = 0;
+
+            switch (operator) {
+                case 'tambah':
+                    hasil = n1 + n2;
+                    break;
+                case 'kurang':
+                    hasil = n1 - n2;
+                    break;
+                case 'kali':
+                    hasil = n1 * n2;
+                    break;
+                case 'bagi':
+                    if (n2 === 0) {
+                        alert("Error: Tidak bisa membagi dengan angka 0!");
+                        return;
+                    }
+                    hasil = n1 / n2;
+                    break;
+                default:
+                    hasil = 0;
+            }
+
+            resultValue.textContent = Number(hasil.toFixed(4));
+            resultBox.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
